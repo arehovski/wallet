@@ -1,0 +1,9 @@
+.idea/
+*.pyc
+__pycache__/
+venv
+.env.dev
+.env.db
+.pytest_cache/
+migrations/
+media/

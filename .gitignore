@@ -2,8 +2,7 @@
 *.pyc
 __pycache__/
 venv
-.env.dev
-.env.db
+.env
 .pytest_cache/
 migrations/
 media/

@@ -3,7 +3,7 @@ import uuid
 from fastapi import Depends
 from fastapi_users import UUIDIDMixin, BaseUserManager
 
-from core.models.users import User, get_user_db
+from core.users.models import User, get_user_db
 from settings.common import TOKEN_SECRET
 
 

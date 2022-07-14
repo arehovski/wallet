@@ -17,9 +17,9 @@ class Category(Base):
     __tablename__ = "category"
 
     id: int = Column("id", Integer, primary_key=True)
-    user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"))
-    name: str = Column("name", String, unique=True)
-    type: enum.Enum = Column("type", Enum(CategoryType))
+    user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"), nullable=False)
+    name: str = Column("name", String, unique=True, nullable=False)
+    type: enum.Enum = Column("type", Enum(CategoryType), nullable=False)
 
     user = relationship("User", back_populates="categories")
     transactions_from = relationship("Transaction", back_populates="category_from")

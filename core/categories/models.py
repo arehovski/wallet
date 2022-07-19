@@ -1,6 +1,6 @@
 import enum
 
-from sqlalchemy import Column, Integer, String, Enum, ForeignKey, UniqueConstraint
+from sqlalchemy import Column, Integer, String, Enum, ForeignKey, UniqueConstraint, Numeric
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 
@@ -20,6 +20,7 @@ class Category(Base):
     user_id = Column(UUID(as_uuid=True), ForeignKey("user.id"), nullable=False, index=True)
     name: str = Column("name", String, nullable=False)
     type: enum.Enum = Column("type", Enum(CategoryType), nullable=False)
+    starting_balance = Column("starting_balance", Numeric(16, 2), default=0)
 
     user = relationship("User", back_populates="categories")
     transactions_from = relationship("Transaction", back_populates="category_from")

@@ -10,6 +10,8 @@ from alembic import context
 
 from settings.db import SQLALCHEMY_DATABASE_URL
 from core.users.models import User
+from core.categories.models import Category
+from core.transactions.models import Transaction
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.

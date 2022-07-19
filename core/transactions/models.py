@@ -24,7 +24,7 @@ class Transaction(Base):
     category_from_id = Column(Integer, ForeignKey("category.id"), nullable=False, index=True)
     category_to_id = Column(Integer, ForeignKey("category.id"), nullable=False, index=True)
     amount: Decimal = Column("amount", Numeric(16, 2), nullable=False)
-    type: enum.Enum = Column("type", Enum(TransactionType), nullable=False, index=True)
+    type: enum.Enum = Column("type", Enum(TransactionType), nullable=False)
     created: datetime.datetime = Column("created", DateTime, default=datetime.datetime.now, nullable=False, index=True)
 
     user = relationship("User", back_populates="transactions")

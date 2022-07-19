@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
 
+from core.categories.api import router as categories_router
 from core.users.api import fastapi_users
 from core.users.schemas import UserRead, UserCreate, UserUpdate
 from settings.auth import auth_backend
@@ -30,3 +31,5 @@ app.include_router(fastapi_users.get_auth_router(auth_backend), prefix="/auth/jw
 app.include_router(fastapi_users.get_register_router(UserRead, UserCreate), prefix="/auth", tags=["auth"])
 app.include_router(fastapi_users.get_reset_password_router(), prefix="/auth", tags=["auth"])
 app.include_router(fastapi_users.get_users_router(UserRead, UserUpdate), prefix="/users", tags=["users"])
+
+app.include_router(categories_router, prefix="categories", tags=["categories"])

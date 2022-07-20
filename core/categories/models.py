@@ -23,8 +23,8 @@ class Category(Base):
     starting_balance = Column("starting_balance", Numeric(16, 2), default=0)
 
     user = relationship("User", back_populates="categories")
-    transactions_from = relationship("Transaction", back_populates="category_from")
-    transactions_to = relationship("Transaction", back_populates="category_to")
+    transactions_from = relationship("Transaction", back_populates="category_from", foreign_keys="Transaction.category_from_id")
+    transactions_to = relationship("Transaction", back_populates="category_to", foreign_keys="Transaction.category_to_id")
 
     __table_args__ = (
         UniqueConstraint('user_id', 'name', name='user_category_uc'),

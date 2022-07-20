@@ -28,5 +28,5 @@ class Transaction(Base):
     created: datetime.datetime = Column("created", DateTime, default=datetime.datetime.now, nullable=False, index=True)
 
     user = relationship("User", back_populates="transactions")
-    category_from = relationship("Category", back_populates="transactions_from")
-    category_to = relationship("Category", back_populates="transactions_to")
+    category_from = relationship("Category", back_populates="transactions_from", foreign_keys=[category_from_id])
+    category_to = relationship("Category", back_populates="transactions_to", foreign_keys=[category_to_id])

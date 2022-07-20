@@ -1,3 +1,4 @@
+import uuid
 from decimal import Decimal
 
 from pydantic import BaseModel
@@ -11,3 +12,9 @@ class CategoryCreate(BaseModel):
     starting_balance: Decimal
 
 
+class CategoryGet(BaseModel):
+    id: int
+    user_id: uuid.UUID
+    name: str
+    type: CategoryType
+    starting_balance: Decimal

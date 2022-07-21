@@ -9,12 +9,11 @@ from sqlalchemy.orm import relationship
 
 from settings.db import Base, get_async_session
 
-# TODO sqlalchemy rel imports
 
 class User(SQLAlchemyBaseUserTableUUID, Base):
     created: datetime.datetime = Column('created', DateTime, default=datetime.datetime.now, nullable=False)
 
-    categories = relationship("User", back_populates="user")
+    categories = relationship("Category", back_populates="user")
     transactions = relationship("Transaction", back_populates="user")
 
 

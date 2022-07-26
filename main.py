@@ -1,5 +1,8 @@
+import time
+
 from fastapi import FastAPI
 from fastapi.openapi.utils import get_openapi
+from starlette.requests import Request
 
 from core.categories.api import router as categories_router
 from core.users.api import fastapi_users
@@ -7,6 +10,18 @@ from core.users.schemas import UserRead, UserCreate, UserUpdate
 from settings.auth import auth_backend
 
 app = FastAPI()
+
+
+@app.middleware("http")
+async def log_requests(request: Request, call_next):
+    start_time = time.perf_counter()
+
+    response = await call_next(request)
+
+    process_time = (time.perf_counter() - start_time) * 1000
+    print(f"completed_in={process_time}ms status_code={response.status_code}")
+
+    return response
 
 
 def wallet_openapi():

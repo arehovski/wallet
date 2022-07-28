@@ -16,6 +16,6 @@ class CategoryCreate(CategoryBase):
     pass
 
 
-class CategoryGet(CategoryBase):
+class Category(CategoryBase):
     id: int
     user_id: uuid.UUID

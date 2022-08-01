@@ -1,9 +1,12 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 
 from core.categories.exceptions import CategoryAlreadyExists
+from core.categories.models import CategoryType
 from core.categories.repository import get_category_repository, CategoryRepository
-from core.categories.schemas import CategoryCreate, Category
+from core.categories.schemas import CategoryCreate, CategorySchema
 from core.users.api import current_user
 from core.users.models import User
 
@@ -14,25 +17,44 @@ router = APIRouter()
     "/",
     status_code=status.HTTP_201_CREATED,
     name="category:create",
+    response_model=CategorySchema,
     responses={
         status.HTTP_400_BAD_REQUEST: {
-            "description": "Category has already exists."
-        },
-        status.HTTP_401_UNAUTHORIZED: {
-            "description": "Unauthorized"
-        },
-    }
+            "content": {
+                "application/json": {
+                    "examples": {
+                        "Category has already exists.": {
+                            "summary": "A category for this user has already exists.",
+                            "value": {"detail": CategoryAlreadyExists("Salary").msg},
+                        },
+                    }
+                }
+            }
+        }
+    },
 )
 async def create(
     data: CategoryCreate,
     user: User = Depends(current_user),
     repository: CategoryRepository = Depends(get_category_repository),
-) -> Category:
+) -> CategorySchema:
     try:
         category = await repository.create(data, user)
-    except CategoryAlreadyExists:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Category has already exists."
-        )
+    except CategoryAlreadyExists as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.msg)
     return category
+
+
+@router.get(
+    "/list",
+    status_code=status.HTTP_200_OK,
+    name="category:list",
+    response_model=list[CategorySchema]
+)
+async def categories_list(
+    category_type: Optional[CategoryType],
+    user: User = Depends(current_user),
+    repository: CategoryRepository = Depends(get_category_repository),
+) -> list[CategorySchema]:
+    return await repository.categories_list(user, category_type)
+    # return [CategorySchema.from_orm(category) for category in categories]

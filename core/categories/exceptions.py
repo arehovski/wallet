@@ -1,2 +1,3 @@
 class CategoryAlreadyExists(Exception):
-    pass
+    def __init__(self, category_name: str):
+        self.msg = f"Category {category_name} has already exists."

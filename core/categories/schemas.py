@@ -16,6 +16,9 @@ class CategoryCreate(CategoryBase):
     pass
 
 
-class Category(CategoryBase):
+class CategorySchema(CategoryBase):
     id: int
     user_id: uuid.UUID
+
+    class Config:
+        orm_mode = True

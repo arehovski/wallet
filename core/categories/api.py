@@ -1,5 +1,3 @@
-from typing import Optional
-
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 
@@ -52,9 +50,8 @@ async def create(
     response_model=list[CategorySchema]
 )
 async def categories_list(
-    category_type: Optional[CategoryType],
+    category_type: CategoryType | None = None,
     user: User = Depends(current_user),
     repository: CategoryRepository = Depends(get_category_repository),
 ) -> list[CategorySchema]:
     return await repository.categories_list(user, category_type)
-    # return [CategorySchema.from_orm(category) for category in categories]

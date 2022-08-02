@@ -34,14 +34,12 @@ class CategoryRepository:
         await self.session.refresh(category)
         return category
 
-    async def categories_list(self, user: User, category_type: Optional[CategoryType]):
-        query = (
-            select(Category)
-            .where(Category.user_id == user.id)
-            .where(Category.type == category_type)
-        )
+    async def categories_list(self, user: User, category_type: CategoryType | None):
+        query = select(Category).where(Category.user_id == user.id)
+        if category_type:
+            query = query.where(Category.type == category_type)
         result = await self.session.execute(query)
-        return result.all()
+        return result.scalars().all()
 
 
 def get_category_repository(session: AsyncSession = Depends(get_async_session)):

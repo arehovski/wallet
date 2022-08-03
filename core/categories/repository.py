@@ -27,7 +27,7 @@ class CategoryRepository:
         await self.session.refresh(category)
         return category
 
-    async def categories_list(self, user: User, category_type: CategoryType | None):
+    async def list(self, user: User, category_type: CategoryType | None):
         query = select(Category).where(Category.user_id == user.id)
         if category_type:
             query = query.where(Category.type == category_type)
@@ -36,8 +36,6 @@ class CategoryRepository:
 
     async def update(self, id: int, user: User, data: CategoryUpdate) -> Category:
         category = await self._get_by_id(id, user.id)
-        if not category:
-            raise CategoryNotFound()
 
         update_dict = data.dict(exclude_unset=True)
         if name := update_dict.get("name"):
@@ -49,6 +47,11 @@ class CategoryRepository:
         await self.session.commit()
         await self.session.refresh(category)
         return category
+
+    async def delete(self, id: int, user: User) -> None:
+        category = await self._get_by_id(id, user.id)
+        await self.session.delete(category)
+        await self.session.commit()
 
     async def _check_existing_category(self, name: str, user_id: UUID) -> None:
         existing_category = await self._get_by_name(name, user_id)
@@ -69,7 +72,10 @@ class CategoryRepository:
             .where(Category.user_id == user_id)
             .where(Category.id == id)
         )
-        return await self._get_category(query)
+        category = await self._get_category(query)
+        if not category:
+            raise CategoryNotFound()
+        return category
 
     async def _get_category(self, statement: Select) -> Category | None:
         result = await self.session.execute(statement)

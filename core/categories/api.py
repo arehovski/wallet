@@ -53,12 +53,12 @@ async def create(
 
 
 @router.get("/", status_code=status.HTTP_200_OK, name="category:list", response_model=list[CategorySchema])
-async def categories_list(
+async def list_(
     category_type: CategoryType | None = None,
     user: User = Depends(current_user),
     repository: CategoryRepository = Depends(get_category_repository),
 ) -> list[CategorySchema]:
-    return await repository.categories_list(user, category_type)
+    return await repository.list(user, category_type)
 
 
 @router.patch(
@@ -93,5 +93,30 @@ async def update(
         return await repository.update(id, user, data)
     except CategoryAlreadyExists as e:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.msg)
+    except CategoryNotFound as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND) from e
+
+
+@router.delete(
+    "/{id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    name="category:delete",
+    responses={
+        status.HTTP_404_NOT_FOUND: {
+            "content": {
+                "application/json": {
+                    "examples": CATEGORY_NOT_FOUND_RESPONSE,
+                }
+            }
+        },
+    },
+)
+async def delete(
+    id: int,
+    user: User = Depends(current_user),
+    repository: CategoryRepository = Depends(get_category_repository),
+) -> None:
+    try:
+        await repository.delete(id, user)
     except CategoryNotFound as e:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND) from e

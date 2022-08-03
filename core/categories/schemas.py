@@ -1,7 +1,8 @@
 import uuid
 from decimal import Decimal
+from typing import Optional
 
-from pydantic import BaseModel, validator, ValidationError
+from pydantic import BaseModel, validator
 
 from core.categories.models import CategoryType
 
@@ -22,8 +23,7 @@ class CategoryCreate(CategoryBase):
 
 
 class CategoryUpdate(CategoryBase):
-    name: str | None
-    starting_balance: Decimal | None
+    __annotations__ = {k: Optional[v] for k, v in CategoryBase.__annotations__.items()}
 
 
 class CategorySchema(CategoryBase):

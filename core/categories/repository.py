@@ -37,9 +37,9 @@ class CategoryRepository:
     async def update(self, id: int, user: User, data: CategoryUpdate) -> Category:
         category = await self._get_by_id(id, user.id)
         if not category:
-            raise CategoryNotFound(f"Category with id {id} not found for user {user.email}.")
+            raise CategoryNotFound()
 
-        update_dict = data.dict() #TODO
+        update_dict = data.dict(exclude_unset=True)
         if name := update_dict.get("name"):
             await self._check_existing_category(name, user.id)
 

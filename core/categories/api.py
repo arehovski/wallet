@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from starlette import status
 
-from core.categories.exceptions import CategoryAlreadyExists
+from core.categories.exceptions import CategoryAlreadyExists, CategoryNotFound
 from core.categories.models import CategoryType
 from core.categories.repository import get_category_repository, CategoryRepository
 from core.categories.schemas import CategoryCreate, CategorySchema, CategoryUpdate
@@ -9,6 +9,20 @@ from core.users.api import current_user
 from core.users.models import User
 
 router = APIRouter()
+
+
+CATEGORY_EXISTS_RESPONSE = {
+    "Category has already exists.": {
+        "summary": "A category for this user has already exists.",
+        "value": {"detail": CategoryAlreadyExists("Salary").msg},
+    }
+}
+CATEGORY_NOT_FOUND_RESPONSE = {
+    "Category not found.": {
+        "summary": "A category not found for this user.",
+        "value": {"detail": "Not Found"},
+    }
+}
 
 
 @router.post(
@@ -20,12 +34,7 @@ router = APIRouter()
         status.HTTP_400_BAD_REQUEST: {
             "content": {
                 "application/json": {
-                    "examples": {
-                        "Category has already exists.": {
-                            "summary": "A category for this user has already exists.",
-                            "value": {"detail": CategoryAlreadyExists("Salary").msg},
-                        },
-                    }
+                    "examples": CATEGORY_EXISTS_RESPONSE,
                 }
             }
         }
@@ -43,12 +52,7 @@ async def create(
     return category
 
 
-@router.get(
-    "/",
-    status_code=status.HTTP_200_OK,
-    name="category:list",
-    response_model=list[CategorySchema]
-)
+@router.get("/", status_code=status.HTTP_200_OK, name="category:list", response_model=list[CategorySchema])
 async def categories_list(
     category_type: CategoryType | None = None,
     user: User = Depends(current_user),
@@ -61,7 +65,23 @@ async def categories_list(
     "/{id}",
     status_code=status.HTTP_200_OK,
     name="category:update",
-    response_model=CategorySchema
+    response_model=CategorySchema,
+    responses={
+        status.HTTP_400_BAD_REQUEST: {
+            "content": {
+                "application/json": {
+                    "examples": CATEGORY_EXISTS_RESPONSE,
+                }
+            }
+        },
+        status.HTTP_404_NOT_FOUND: {
+            "content": {
+                "application/json": {
+                    "examples": CATEGORY_NOT_FOUND_RESPONSE,
+                }
+            }
+        },
+    },
 )
 async def update(
     id: int,
@@ -69,4 +89,9 @@ async def update(
     user: User = Depends(current_user),
     repository: CategoryRepository = Depends(get_category_repository),
 ) -> CategorySchema:
-    return await repository.update(id, user, data) #TODO
+    try:
+        return await repository.update(id, user, data)
+    except CategoryAlreadyExists as e:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=e.msg)
+    except CategoryNotFound as e:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND) from e

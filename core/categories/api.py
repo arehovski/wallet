@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
+from fastapi_users.router.common import ErrorModel
 from starlette import status
 
 from core.categories.exceptions import CategoryAlreadyExists, CategoryNotFound

@@ -4,6 +4,9 @@ WORKDIR /app/src
 
 RUN apt-get update && pip install --upgrade pip && pip install poetry
 
-COPY . /app/src
+COPY poetry.lock /app/src
+COPY pyproject.toml /app/src
 
 RUN poetry config virtualenvs.create false && poetry install
+
+COPY . /app/src
